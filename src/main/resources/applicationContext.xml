@@ -1,0 +1,96 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<beans xmlns="http://www.springframework.org/schema/beans"
+	xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+	xmlns:util="http://www.springframework.org/schema/util"
+	xmlns:p="http://www.springframework.org/schema/p"
+	xmlns:context="http://www.springframework.org/schema/context"
+	xmlns:zzw="http://www.asiainfo.com/schema/service"
+	xmlns:tx="http://www.springframework.org/schema/tx"
+	xmlns:aop="http://www.springframework.org/schema/aop"
+	xsi:schemaLocation="http://www.springframework.org/schema/beans 
+       http://www.springframework.org/schema/beans/spring-beans-4.0.xsd
+       http://www.springframework.org/schema/util
+       http://www.springframework.org/schema/util/spring-util-4.0.xsd
+       http://www.springframework.org/schema/context
+       http://www.springframework.org/schema/context/spring-context-4.0.xsd
+       http://www.asiainfo.com/schema/service
+       http://www.asiainfo.com/schema/service.xsd
+       http://www.springframework.org/schema/tx
+       http://www.springframework.org/schema/tx/spring-tx-4.0.xsd
+       http://www.springframework.org/schema/aop
+       http://www.springframework.org/schema/aop/spring-aop-4.0.xsd
+       ">
+
+	<context:component-scan
+		base-package="com.asiainfo"></context:component-scan>
+
+	<!-- 1、基于xml的事务配置 -->	
+	<!-- 定义数据源 -->
+	<!-- <bean id="dataSource"
+		class="org.apache.commons.dbcp.BasicDataSource" destroy-method="close"
+		p:riverClassName="com.mysql.jdbc.Driver"
+		p:url="jdbc:mysql://localhost:3306/sampledb" p:username="root"
+		p:password="zzw1234"></bean> -->
+	
+	<!-- 定义事务管理器 -->
+<!-- 	<bean id="txManager" class="org.springframework.jdbc.datasource.DataSourceTransactionManager" p:dataSource-ref="dataSource"></bean> -->
+	
+	<!-- 通过aop实现事务管理 -->
+<!-- 	<aop:config> -->
+		<!-- 定义切点，切点就是哪些类的哪些方法可以织入事务管理的逻辑 -->
+<!-- 		<aop:pointcut id="txPointcut" expression="execution(* com.asiainfo.service..*.*(..))"/> -->
+		<!-- 定义增强 -->
+<!-- 		<aop:advisor advice-ref="txAdvice" pointcut-ref="txPointcut"/> -->
+<!-- 	</aop:config> -->
+	
+	<!-- 定义事务增强 -->
+<!-- 	<tx:advice id="txAdvice" transaction-manager="txManager"> -->
+		<!-- 定义事务属性 -->
+<!-- 		<tx:attributes> -->
+<!-- 			<tx:method name="get*" read-only="true"/> -->
+<!-- 			<tx:method name="save*" read-only="false" isolation="DEFAULT" rollback-for="SQLException" no-rollback-for="RuntimeException"/> -->
+<!-- 		</tx:attributes> -->
+<!-- 	</tx:advice> -->
+		
+		<!-- 2、基于annotation的事务配置 -->
+		<!-- 配置数据源，无论底层使用什么持久化技术，都是要建立与数据库的连接的，这些在spring中以数据源表示，这个是必不可少的 -->
+<!-- 		<bean id="dataSource" class="org.apache.commons.dbcp.BasicDataSource"  -->
+<!-- 			p:driverClassName="com.mysql.jdbc.Driver" -->
+<!-- 			p:url="jdbc:mysql://localhost:3306/sampledb" -->
+<!-- 			p:username="root" -->
+<!-- 			p:password="zzw1234"></bean> -->
+		
+		<!-- 定义事务管理器，如果底层的持久化框架使用spring的jdbc或者mybatis，事务管理器要用DataSourceTransactionManager，其他的持久化技术要用相应的事务管理器，可以详见课本 -->	
+<!-- 		<bean id="transactionManager" class="org.springframework.jdbc.datasource.DataSourceTransactionManager" p:dataSource-ref="dataSource"></bean>  事务管理器要用到数据源与数据库建立连接 -->
+		
+		<!-- 扫面@Transactional注解，并织入事务横切逻辑 -->
+		<!-- <tx:annotation-driven/> -->   <!-- annotation-driven默认应用名称为transactionManager的事务管理器，如果定义的事务管理器的名称恰好是它就不用给transaction-manager属性赋值，否则需要赋值 -->
+
+		<!-- 如果一个应用当中需要使用不同的事务管理器（这种情况很少，一般使用一个就可以），则要定义多个，而且每个使用的数据源可以不一样 -->
+		<bean id="dataSource1" class="org.apache.commons.dbcp.BasicDataSource" destroy-method="close"
+		p:driverClassName="com.mysql.jdbc.Driver"
+		p:url="jdbc:mysql://localhost:3306/sampledb"
+		p:username="root"
+		p:password="zzw1234"
+		></bean>
+		
+		<bean id="dataSource2" class="org.apache.commons.dbcp.BasicDataSource" destroy-method="close"
+		p:driverClassName="oracle.jdbc.driver.OracleDriver"
+		p:url="jdbc:oracle:thin:@localhost:1521:orcl"
+		p:username="root"
+		p:password="ora1234"
+		></bean>
+
+		<bean id="txMgr1" class="org.springframework.jdbc.datasource.DataSourceTransactionManager" p:dataSource-ref="dataSource1" >
+			<qualifier value="tx1"></qualifier>
+		</bean>
+		
+		<bean id="txMgr2" class="org.springframework.jdbc.datasource.DataSourceTransactionManager" p:dataSource-ref="dataSource2" >
+			<qualifier value="tx2"></qualifier>
+		</bean>
+
+
+
+
+
+</beans>
